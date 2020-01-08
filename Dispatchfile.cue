@@ -4,7 +4,7 @@ resource "src-git": {
   param revision: "$(context.git.commit)"
 }
 
-task "test": {
+task "release": {
   inputs: ["src-git"]
 
   steps: [
@@ -19,15 +19,7 @@ task "test": {
 
 actions: [
   {
-    tasks: ["test"]
-    on push: {
-      branches: ["master"]
-    }
-  },
-  {
-    tasks: ["test"]
-    on pull_request: {
-      chatops: ["test"]
-    }
+    tasks: ["release"]
+    on tag: {}
   }
 ]
