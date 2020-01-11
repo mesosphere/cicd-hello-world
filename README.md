@@ -1,4 +1,4 @@
-# Hello Application example
+###### Hello Application example
 
 This repository shows how to configure a containerized Go web server
 application for CI/CD using Pumpkin.
