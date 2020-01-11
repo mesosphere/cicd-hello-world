@@ -9,52 +9,8 @@ resource "gitops-git": {
   param url: "https://github.com/cprovencher/cicd-hello-world-gitops"
 }
 
-resource "docker-image": {
-  type: "image"
-  param url: "cprovencher/hello-world:$(context.build.name)"
-  param digest: "$(inputs.resources.docker-image.digest)"
-}
-
-task "test": {
-  inputs: ["src-git"]
-
-  steps: [
-    {
-      name: "test"
-      image: "golang:1.13.0-buster"
-      command: [ "go", "test", "./..." ]
-      workingDir: "/workspace/src-git"
-    }
-  ]
-}
-
-task "build": {
-  inputs: ["src-git"]
-  outputs: ["docker-image"]
-  deps: ["test"]
-
-  steps: [
-    {
-      name: "build-and-push"
-      image: "chhsiao/kaniko-executor"
-      args: [
-        "--destination=$(outputs.resources.docker-image.url)",
-        "--context=/workspace/src-git",
-        "--oci-layout-path=/builder/home/image-outputs/docker-image",
-        "--dockerfile=/workspace/src-git/Dockerfile"
-      ],
-      env: [
-        {
-          name: "DOCKER_CONFIG",
-          value: "/builder/home/.docker"
-        }
-      ]
-    }
-  ]
-}
-
-task "deploy": {
-  inputs: ["docker-image", "gitops-git"]
+task "release": {
+  inputs: ["gitops-git"]
   steps: [
     {
       name: "update-gitops-repo"
@@ -62,7 +18,7 @@ task "deploy": {
       workingDir: "/workspace/gitops-git"
       args: [
         "-git-revision=$(context.git.commit)",
-        "-substitute=imageName=cprovencher/hello-world@$(inputs.resources.docker-image.digest)"
+        "-substitute=releaseUrl=//ok//$(context.git.commit)//ok//"
       ]
     }
   ]
@@ -70,15 +26,12 @@ task "deploy": {
 
 actions: [
   {
-    tasks: ["build", "deploy"]
-    on push branches: ["master"]
-  },
-  {
-    tasks: ["build"]
-    on pull_request chatops: ["build"]
-  },
-  {
-    tasks: ["build"]
+    tasks: ["release"]
     on push tags: ["*"]
-  }
+  },
+  {
+    tasks: ["release"]
+    on push branches: ["*"]
+  },
 ]
+
