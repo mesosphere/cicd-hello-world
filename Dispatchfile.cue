@@ -18,7 +18,7 @@ task "release": {
       workingDir: "/workspace/gitops-git"
       args: [
         "-git-revision=$(context.git.commit)",
-        "-substitute=releaseUrl=//ok//$(context.git.commit)//ok//"
+        "-substitute=releaseUrl=//ok//$(context.git.tag)//ok//"
       ]
     }
   ]
