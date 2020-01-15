@@ -7,6 +7,7 @@ resource "src-git": {
 resource "gitops-git": {
   type: "git"
   param url: "https://github.com/cprovencher/cicd-hello-world-gitops"
+  param revision: "testbranch"
 }
 
 task "release": {
