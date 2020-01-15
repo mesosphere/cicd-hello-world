@@ -7,12 +7,19 @@ resource "src-git": {
 resource "gitops-git": {
   type: "git"
   param url: "https://github.com/cprovencher/cicd-hello-world-gitops"
-  param revision: "testbranch"
 }
 
 task "release": {
   inputs: ["gitops-git"]
   steps: [
+    {
+      name: "fetch-master"
+      image: "alpine/git"
+      workingDir: "/workspace/gitops-git"
+      args: [
+        "fetch", "origin", "master"
+      ]
+    },
     {
       name: "update-gitops-repo"
       image: "mesosphere/update-gitops-repo:v1.0"
@@ -28,6 +35,6 @@ task "release": {
 actions: [
   {
     tasks: ["release"]
-    on tag names: ["v*"]
+    on tag names: ["*"]
   }
 ]
