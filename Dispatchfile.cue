@@ -27,7 +27,6 @@ task "release": {
 actions: [
   {
     tasks: ["release"]
-    on tag names: ["*"]
+    on tag names: ["v*"]
   }
 ]
-
