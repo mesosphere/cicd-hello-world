@@ -9,7 +9,7 @@ resource "gitops-git": {
   param url: "https://github.com/cprovencher/cicd-hello-world-gitops"
 }
 
-task "release": {
+task "upgrade-soak": {
   inputs: ["gitops-git"]
   steps: [
     {
@@ -26,7 +26,7 @@ task "release": {
       workingDir: "/workspace/gitops-git"
       args: [
         "-git-revision=$(context.git.commit)",
-        "-substitute=releaseUrl=//ok//$(context.git.tag)//ok//"
+        "-substitute=konvoyDownloadUrl=https://github.com/mesosphere/konvoy/releases/download/$(context.git.tag)/konvoy_$(context.git.tag)_linux.tar.bz2"
       ]
     }
   ]
@@ -34,7 +34,7 @@ task "release": {
 
 actions: [
   {
-    tasks: ["release"]
-    on tag names: ["*"]
+    tasks: ["upgrade-soak"]
+    on tag names: ["v*"]
   }
 ]
