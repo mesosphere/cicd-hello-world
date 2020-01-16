@@ -26,7 +26,7 @@ task "upgrade-soak": {
       workingDir: "/workspace/gitops-git"
       args: [
         "-git-revision=$(context.git.commit)",
-        "-substitute=konvoyDownloadUrl=https://github.com/mesosphere/konvoy/releases/download/$(context.git.tag)/konvoy_$(context.git.tag)_linux.tar.bz2"
+        "-substitute=konvoyVersion=$(context.git.tag)"
       ]
     }
   ]
