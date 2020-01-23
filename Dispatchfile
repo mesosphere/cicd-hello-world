@@ -4,27 +4,6 @@ resource "src-git": {
   param revision: "$(context.git.commit)"
 }
 
-actions: [
-  {
-    tasks: ["build"]
-    on push: {
-      branches: ["master"]
-    }
-  },
-  {
-    tasks: ["build"]
-    on pull_request: {
-      chatops: ["build"]
-    }
-  },
-  {
-    tasks: ["build"]
-    on tag: {
-      names: ["*"]
-    }
-  }
-]
-
 resource "docker-image": {
   type: "image"
   param url: "craigneth/hello-world:$(context.build.name)"
@@ -68,3 +47,24 @@ task "build": {
     }
   ]
 }
+
+actions: [
+  {
+    tasks: ["build"]
+    on push: {
+      branches: ["master"]
+    }
+  },
+  {
+    tasks: ["build"]
+    on pull_request: {
+      chatops: ["build"]
+    }
+  },
+  {
+    tasks: ["build"]
+    on tag: {
+      names: ["*"]
+    }
+  }
+]
