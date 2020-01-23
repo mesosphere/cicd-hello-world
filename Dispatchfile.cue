@@ -66,6 +66,7 @@ task "deploy": {
       ]
     }
   ]
+}
 
 actions: [
   {
