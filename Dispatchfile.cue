@@ -10,6 +10,11 @@ resource "docker-image": {
   param digest: "$(inputs.resources.docker-image.digest)"
 }
 
+resource "gitops-git": {
+  type: "git"
+  param url: "https://github.com/cneth/cicd-hello-world-gitops"
+}
+
 task "test": {
   inputs: ["src-git"]
 
@@ -48,9 +53,23 @@ task "build": {
   ]
 }
 
+task "deploy": {
+  inputs: ["docker-image", "gitops-git"]
+  steps: [
+    {
+      name: "update-gitops-repo"
+      image: "mesosphere/update-gitops-repo:v1.0"
+      workingDir: "/workspace/gitops-git"
+      args: [
+        "-git-revision=$(context.git.commit)",
+        "-substitute=imageName=craigneth/hello-world@$(inputs.resources.docker-image.digest)"
+      ]
+    }
+  ]
+
 actions: [
   {
-    tasks: ["build"]
+    tasks: ["build", "deploy"]
     on push: {
       branches: ["master"]
     }
