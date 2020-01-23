@@ -6,15 +6,21 @@ resource "src-git": {
 
 actions: [
   {
-    tasks: ["test"]
+    tasks: ["build"]
     on push: {
       branches: ["master"]
     }
   },
   {
-    tasks: ["test"]
+    tasks: ["build"]
     on pull_request: {
-      chatops: ["test"]
+      chatops: ["build"]
+    }
+  },
+  {
+    tasks: ["build"]
+    on tag: {
+      names: ["*"]
     }
   }
 ]
@@ -68,25 +74,3 @@ task "build": {
     }
   ]
 }
-
-
-actions: [
-  {
-    tasks: ["build"]
-    on push: {
-      branches: ["master"]
-    }
-  },
-  {
-    tasks: ["build"]
-    on pull_request: {
-      chatops: ["build"]
-    }
-  },
-  {
-    tasks: ["build"]
-    on tag: {
-      names: ["*"]
-    }
-  }
-]
