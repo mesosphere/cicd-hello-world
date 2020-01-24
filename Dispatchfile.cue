@@ -2,7 +2,7 @@ resource "src-git": {
   type: "git"
   param url: "$(context.git.url)"
   param revision: "$(context.git.commit)"
-  param path: "magicfile"
+  param paths: ["magicfile"]
 }
 
 resource "gitops-git": {
