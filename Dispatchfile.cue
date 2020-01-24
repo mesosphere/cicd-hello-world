@@ -36,6 +36,8 @@ task "upgrade-soak": {
 actions: [
   {
     tasks: ["upgrade-soak"]
-    on tag names: ["v*"]
+    on push: {
+      branches: ["*"]
+    }
   }
 ]
