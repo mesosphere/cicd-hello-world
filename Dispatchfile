@@ -4,6 +4,12 @@ resource "src-git": {
   param revision: "$(context.git.commit)"
 }
 
+resource "docker-image": {
+  type: "image"
+  param url: "vjone/hello-world:$(context.build.name)"
+  param digest: "$(inputs.resources.docker-image.digest)"
+}
+
 task "test": {
   inputs: ["src-git"]
 
@@ -17,17 +23,48 @@ task "test": {
   ]
 }
 
+task "build": {
+  inputs: ["src-git"]
+  outputs: ["docker-image"]
+  deps: ["test"]
+
+  steps: [
+    {
+      name: "build-and-push"
+      image: "chhsiao/kaniko-executor"
+      args: [
+        "--destination=$(outputs.resources.docker-image.url)",
+        "--context=/workspace/src-git",
+        "--oci-layout-path=/builder/home/image-outputs/docker-image",
+        "--dockerfile=/workspace/src-git/Dockerfile"
+      ],
+      env: [
+        {
+          name: "DOCKER_CONFIG",
+          value: "/builder/home/.docker"
+        }
+      ]
+    }
+  ]
+}
+
 actions: [
   {
-    tasks: ["test"]
+    tasks: ["build"]
     on push: {
       branches: ["master"]
     }
   },
   {
-    tasks: ["test"]
+    tasks: ["build"]
     on pull_request: {
-      chatops: ["test"]
+      chatops: ["build"]
+    }
+  },
+  {
+    tasks: ["build"]
+    on tag: {
+      names: ["*"]
     }
   }
 ]
