@@ -40,13 +40,13 @@ task "build": {
       args: [
         "--destination=$(outputs.resources.docker-image.url)",
         "--context=/workspace/src-git",
-        "--oci-layout-path=/builder/home/image-outputs/docker-image",
+        "--oci-layout-path=/workspace/output/docker-image",
         "--dockerfile=/workspace/src-git/Dockerfile"
       ],
       env: [
         {
           name: "DOCKER_CONFIG",
-          value: "/builder/home/.docker"
+          value: "/tekton/home/.docker"
         }
       ]
     }
