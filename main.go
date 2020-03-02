@@ -56,7 +56,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, world!\n")
 	fmt.Fprintf(w, "Version: %s\n", Version)
 	fmt.Fprintf(w, "Build time: %s\n", Buildtime)
-	fmt.Fprintf(w, "D2iQ CI/CD!  deployed using Tekton/Argo-cd 1.0.2\n")
+	fmt.Fprintf(w, "D2iQ CI/CD!  deployed using Tekton/Argo-cd 1.0.2 - Dispatch 1.0\n")
 }
 
 // [END all]
