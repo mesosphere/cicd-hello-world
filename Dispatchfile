@@ -6,7 +6,7 @@ resource "src-git": {
 
 resource "docker-image": {
   type: "image"
-  param url: "your-dockerhub-user/hello-world:$(context.build.name)"
+  param url: "michaelbi/hello-world:$(context.build.name)"
   param digest: "$(inputs.resources.docker-image.digest)"
 }
 
