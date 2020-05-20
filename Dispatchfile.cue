@@ -36,12 +36,26 @@ task "upgrade-soak": {
   ]
 }
 
+task "script-exec": {
+  steps: [
+    {
+      name: "check-script"
+      image: "busybox:latest"
+      workingDir: "/workspace/src-git"
+      command: ["./magicfile"]
+      args: [
+         "asdf", "zxcv"
+      ]
+    }
+  ]
+}
+
+
 actions: [
   {
-    tasks: ["upgrade-soak"]
+    tasks: ["script-exec"]
     on push: {
       branches: ["*"]
-      paths: ["magicfile"]
     }
   }
 ]

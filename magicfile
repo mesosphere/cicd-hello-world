@@ -1,2 +1,6 @@
-asdfsadfasdf
-han
+#!/bin/sh
+
+echo start
+echo $0
+echo $1
+echo end
