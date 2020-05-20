@@ -22,11 +22,15 @@ task "upgrade-soak": {
     },
     {
       name: "update-gitops-repo"
-      image: "mesosphere/update-gitops-repo:v1.0"
+      image: "mesosphere/update-gitops-repo:1.2.0-beta1-69-g8b7a421c"
       workingDir: "/workspace/gitops-git"
       args: [
         "-git-revision=$(context.git.commit)",
-        "-substitute=konvoyVersion=$(context.git.tag)"
+        "-substitute=replaceThis=$(context.git.commit)",
+        "-branch=master",
+        "-create-pull-request=false",
+        "-commit-message=\"Deploy soak update\"",
+        "-merge-pull-request=true"
       ]
     }
   ]
