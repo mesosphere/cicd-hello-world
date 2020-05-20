@@ -26,7 +26,10 @@ task "upgrade-soak": {
       workingDir: "/workspace/gitops-git"
       args: [
         "-git-revision=$(context.git.commit)",
-        "-substitute=konvoyVersion=$(context.git.tag)"
+        "-substitute=replaceThis=$(context.git.commit)",
+        "-branch=master",
+        "-create-pull-request=false",
+        "-commit-message="Deploy soak update"
       ]
     }
   ]
