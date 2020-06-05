@@ -1,0 +1,15 @@
+
+task("pr-helper", steps=[
+  v1.Container(
+      name="echo pr name",
+      image="alpine/git",
+      workingDir="/workspace/src-git",
+      command=["/bin/sh"],
+      args=[
+        "-c",
+        "echo $(context.build.name)"
+      ]
+  )
+])
+
+action(tasks=["pr-helper"], on=pullRequest())
