@@ -6,7 +6,7 @@
 
 task("pr-helper", steps=[
   v1.Container(
-      name="echo pr name",
+      name="get-pr-name",
       image="alpine/git",
       workingDir="/workspace/src-git",
       command=["/bin/sh"],
