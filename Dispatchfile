@@ -10,26 +10,31 @@ gitResource("src-git",
     url="$(context.git.url)",
     revision="$(context.git.commit)")
 
-astring = """
-{
-  body: "WQASDCVB\nasdf\nrewq"
-}
+help_message = """
+asdf
+sadf
+jh
+uytr
+oiu
+rewq
 """
 
-
-task("pr-helper", inputs=["src-git"], steps=[
+task("pr-helper", steps=[
   v1.Container(
-      name="fetch-master",
+      name="pr-helper",
       image="curlimages/curl:7.69.1",
       workingDir="/workspace/src-git",
       command=["/bin/sh"],
       args=[
         "-c",
+        "set -ex;" +
+        "cat <<EOF > /tmp/help_message" +
+        help_message + "EOF" +
         """
-        echo $(context.git.url)
+        BODY=$(sed '$!s/$/\\n/' /tmp/help_message | tr -d '\n')
         PR_NUMBER=$(echo '$(context.build.name)' | grep -oE [0-9]+)
-        curl -f -X POST -H "Authorization: token $GITHUB_TOKEN" --data {thedata} https://api.github.com/repos/cprovencher/cicd-hello-world/issues/$PR_NUMBER/comments
-        """.format(thedata=astring)
+        curl -f -X POST -H "Authorization: token $GITHUB_TOKEN" --data "{\"body\": \"$BODY\"}" https://api.github.com/repos/cprovencher/cicd-hello-world/issues/$PR_NUMBER/comments
+        """
       ],
       env=[k8s.corev1.EnvVar(name="GITHUB_TOKEN", valueFrom=secretVar("cprovencher-basic-auth", "password"))]
   )
