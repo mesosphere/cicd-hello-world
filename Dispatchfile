@@ -3,18 +3,37 @@
 #
 #
 
+def secretVar(name, key):
+    return k8s.corev1.EnvVarSource(secretKeyRef=k8s.corev1.SecretKeySelector(localObjectReference=k8s.corev1.LocalObjectReference(name=name), key=key))
 
-task("pr-helper", steps=[
+gitResource("src-git",
+    url="$(context.git.url)",
+    revision="$(context.git.commit)")
+
+astring = """
+{
+  body: "WQASDCVB\nasdf\nrewq"
+}
+"""
+
+
+task("pr-helper", inputs=["src-git"], steps=[
   v1.Container(
-      name="get-pr-name",
-      image="alpine/git",
+      name="fetch-master",
+      image="curlimages/curl:7.69.1",
       workingDir="/workspace/src-git",
       command=["/bin/sh"],
       args=[
         "-c",
-        "echo $(context.build.name)"
-      ]
+        """
+        echo $(context.git.url)
+        PR_NUMBER=$(echo '$(context.build.name)' | grep -oE [0-9]+)
+        curl -f -X POST -H "Authorization: token $GITHUB_TOKEN" --data {thedata} https://api.github.com/repos/cprovencher/cicd-hello-world/issues/$PR_NUMBER/comments
+        """.format(thedata=astring)
+      ],
+      env=[k8s.corev1.EnvVar(name="GITHUB_TOKEN", valueFrom=secretVar("cprovencher-basic-auth", "password"))]
   )
 ])
+
 
 action(tasks=["pr-helper"], on=pullRequest())
