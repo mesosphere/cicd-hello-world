@@ -28,5 +28,13 @@ task("pr-helper", inputs=["src-git"], steps=[
   )
 ])
 
-action(tasks=["pr-helper"], on=pullRequest())
+dindTask("hello", steps=[
+  v1.Container(
+      name="pr-helpe",
+      args=["python", "--help"],
+  )
+])
+
+
+action(tasks=["hello"], on=pullRequest())
 
