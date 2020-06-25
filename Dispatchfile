@@ -6,35 +6,17 @@
 def secretVar(name, key):
     return k8s.corev1.EnvVarSource(secretKeyRef=k8s.corev1.SecretKeySelector(localObjectReference=k8s.corev1.LocalObjectReference(name=name), key=key))
 
-gitResource("src-git",
-    url="$(context.git.url)",
-    revision="$(context.git.commit)")
+gitResource("src-git")
 
-
-task("pr-helper", inputs=["src-git"], steps=[
+dindTask("pr-helper", inputs=["src-git"], steps=[
   v1.Container(
       name="pr-helper",
-      image="python:alpine3.12",
-      workingDir="/workspace/src-git",
-      command=["/bin/sh"],
-      args=[
-        "-c",
-        """
-        pip install requests
-        python pr_helper.py $(context.build.name)
-        """
-      ],
-      env=[k8s.corev1.EnvVar(name="GITHUB_TOKEN", valueFrom=secretVar("cprovencher-basic-auth", "password"))]
+      image="mesosphere/konvoy-soak:pr-helper",
+      workingDir="/workspace/src-git/",
+      args=["python3", "pr_helper.py", "$(context.build.name)"],
+      env=[k8s.corev1.EnvVar(name="GITHUB_TOKEN", valueFrom=secretVar("d2iq-dispatch-basic-auth", "password"))]
   )
 ])
 
-dindTask("hello", steps=[
-  v1.Container(
-      name="pr-helpe",
-      args=["python", "--help"],
-  )
-])
-
-
-action(tasks=["hello"], on=pullRequest())
+action(tasks=["pr-helper"], on=pullRequest())
 
