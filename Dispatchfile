@@ -13,7 +13,7 @@ gitResource("src-git",
 dindTask("pr-helper", inputs=["src-git"], steps=[
   v1.Container(
       name="pr-helper",
-      image="mesosphere/konvoy-soak:pr_helper",
+      image="mesosphere/konvoy-soak:pr-helper",
       workingDir="/workspace/src-git/",
       args=["python3", "pr_helper.py", "$(context.build.name)"],
       env=[k8s.corev1.EnvVar(name="GITHUB_TOKEN", valueFrom=secretVar("cprovencher-basic-auth", "password"))]
