@@ -6,7 +6,9 @@
 def secretVar(name, key):
     return k8s.corev1.EnvVarSource(secretKeyRef=k8s.corev1.SecretKeySelector(localObjectReference=k8s.corev1.LocalObjectReference(name=name), key=key))
 
-gitResource("src-git")
+gitResource("src-git",
+    url="$(context.git.url)",
+    revision="$(context.git.commit)")
 
 dindTask("pr-helper", inputs=["src-git"], steps=[
   v1.Container(

@@ -71,9 +71,9 @@ def generate_cluster_yaml(version):
     return r_json['url']
 
 pr_number = sys.argv[1].split('-')[1]
-gh_repo = 'konvoy-soak'
-gh_owner = 'mesosphere'
-bot_name = 'd2iq-dispatch'
+gh_repo = 'cicd-hello-world'
+gh_owner = 'cprovencher'
+bot_name = 'cprovencher'
 gh_token = os.environ['GITHUB_TOKEN']
 headers = {'Authorization': 'token ' + gh_token}
 
