@@ -37,10 +37,21 @@ help_message_upgrade = """{title}
 """.format(title=title, check_open_prs=check_open_prs, konvoy_init=konvoy_init, check_commit=check_commit, argo=argo)
 
 
-def generate_cluster_yaml(version):
-    url = 'https://downloads.mesosphere.io/konvoy/konvoy_{version}_linux.tar.bz2'.format(version=version)
 
+pr_number = sys.argv[1].split('-')[1]
+gh_repo = 'cicd-hello-world'
+gh_owner = 'cprovencher'
+bot_name = 'cprovencher'
+gh_token = os.environ['GITHUB_TOKEN']
+headers = {'Authorization': 'token ' + gh_token}
+
+def generate_cluster_yaml(version):
+    gh_token = os.environ['GITHUB_TOKEN']
+    headers = {'Authorization': 'token ' + gh_token}
+    url = 'https://downloads.mesosphere.io/konvoy/konvoy_{version}_linux.tar.bz2'.format(version=version)
     r = requests.get(url, stream = True)
+    print(r.json())
+    r.raise_for_status()
     with open("konvoy.tar.bz2", "wb") as konvoy_file:
         for chunk in r.iter_content(chunk_size = 1024):
             if chunk:
@@ -49,33 +60,28 @@ def generate_cluster_yaml(version):
     tar = tarfile.open('konvoy.tar.bz2', 'r:bz2')
     tar.extractall('konvoy_dir')
     tar.close()
+    konvoy_sub_dir = 'konvoy_dir/konvoy_' + version
+    subprocess.run(['./konvoy', 'init'], cwd=konvoy_sub_dir, check=True)
+    konvoy_yaml = 'konvoy_{}_cluster.yaml'.format(version)
 
-    subprocess.run(['konvoy', 'init'], cwd='konvoy_dir', check=True)
-
-    with open('r', 'konvoy_dir/cluster.yaml') as f:
+    with open(konvoy_sub_dir + '/cluster.yaml', 'r') as f:
         content = f.read()
 
     input = {
-        {'description': 'Temp gist used for the pr-helper in konvoy-soak repo',
-         'files': {
-             konvoy_version + '_cluster.yaml': {
-                 'content': content
-             }
-         }
+        'description': 'Temp gist used for the pr-helper in konvoy-soak repo',
+        'files': {
+            konvoy_yaml: {
+                'content': content
+            }
         }
     }
     data = json.dumps(input).encode('utf-8')
     r = requests.post('https://api.github.com/gists', data=data, headers=headers)
+    r_json = r.json()
     print(r_json)
     r.raise_for_status()
-    return r_json['url']
+    return r_json['files'][konvoy_yaml]['raw_url']
 
-pr_number = sys.argv[1].split('-')[1]
-gh_repo = 'cicd-hello-world'
-gh_owner = 'cprovencher'
-bot_name = 'cprovencher'
-gh_token = os.environ['GITHUB_TOKEN']
-headers = {'Authorization': 'token ' + gh_token}
 
 url = 'https://api.github.com/repos/{}/{}/pulls/{}'.format(gh_owner, gh_repo, pr_number)
 r = requests.get(url, headers=headers)
