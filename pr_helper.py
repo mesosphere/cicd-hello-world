@@ -50,7 +50,7 @@ def generate_cluster_yaml(version):
     headers = {'Authorization': 'token ' + gh_token}
     url = 'https://downloads.mesosphere.io/konvoy/konvoy_{version}_linux.tar.bz2'.format(version=version)
     r = requests.get(url, stream = True)
-    print(r.json())
+    print(r.content)
     r.raise_for_status()
     with open("konvoy.tar.bz2", "wb") as konvoy_file:
         for chunk in r.iter_content(chunk_size = 1024):
@@ -77,17 +77,16 @@ def generate_cluster_yaml(version):
     }
     data = json.dumps(input).encode('utf-8')
     r = requests.post('https://api.github.com/gists', data=data, headers=headers)
-    r_json = r.json()
-    print(r_json)
+    print(r.content)
     r.raise_for_status()
-    return r_json['files'][konvoy_yaml]['raw_url']
+    return r.json()['files'][konvoy_yaml]['raw_url']
 
 
 url = 'https://api.github.com/repos/{}/{}/pulls/{}'.format(gh_owner, gh_repo, pr_number)
 r = requests.get(url, headers=headers)
-r_json = r.json()
-print(r_json)
+print(r.content)
 r.raise_for_status()
+r_json = r.json()
 
 if r_json['user']['login'] == bot_name:
     if r_json['body'] == '':
@@ -96,21 +95,20 @@ if r_json['user']['login'] == bot_name:
         help_message_upgrade.replace('REPLACE_WITH_URL', cluster_yaml_url)
         data = json.dumps({'body': help_message_upgrade}).encode('utf-8')
         r = requests.patch(url, data=data, headers=headers)
-        print(r.json())
+        print(r.content)
         r.raise_for_status()
 else:
     url = 'https://api.github.com/repos/{}/{}/issues/{}/comments'.format(gh_owner, gh_repo, pr_number)
 
     r = requests.get(url, headers=headers)
-    r_json = r.json()
-    print(r_json)
+    print(r.content)
     r.raise_for_status()
 
-    for comment in r_json:
+    for comment in r.json():
         if comment['user']['login'] == bot_name:
             exit(0)
 
     data = json.dumps({'body': help_message}).encode('utf-8')
     r = requests.post(url, data=data, headers=headers)
-    print(r.json())
+    print(r.content)
     r.raise_for_status()
