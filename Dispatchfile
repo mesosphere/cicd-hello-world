@@ -16,7 +16,13 @@ dindTask("pr-helper", inputs=["src-git"], steps=[
       image="mesosphere/konvoy-soak:pr-helper",
       workingDir="/workspace/src-git/",
       args=["python3", "pr_helper.py", "$(context.build.name)"],
-      env=[k8s.corev1.EnvVar(name="GITHUB_TOKEN", valueFrom=secretVar("cprovencher-gist-creator", "password"))]
+      env=[k8s.corev1.EnvVar(name="GITHUB_TOKEN", valueFrom=secretVar("cprovencher-gist-creator", "password"))],
+      resources = k8s.corev1.ResourceRequirements(
+          limits = {
+              "cpu": k8s.resource_quantity("1000m"),
+              "memory": k8s.resource_quantity("6Gi")
+          }
+      )
   )
 ])
 
