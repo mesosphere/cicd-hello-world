@@ -94,7 +94,7 @@ if r_json['user']['login'] == bot_name:
         cluster_yaml_url = generate_cluster_yaml(konvoy_version)
         print('Gist for cluster.yaml created:')
         print(cluster_yaml_url)
-        help_message_upgrade.replace('REPLACE_WITH_URL', cluster_yaml_url)
+        help_message_upgrade = help_message_upgrade.replace('REPLACE_WITH_URL', cluster_yaml_url)
         data = json.dumps({'body': help_message_upgrade}).encode('utf-8')
         r = requests.patch(url, data=data, headers=headers)
         print(r.content)
