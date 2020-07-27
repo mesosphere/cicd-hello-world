@@ -53,10 +53,10 @@ func main() {
 // hello responds to the request with a plain-text "Hello, world" message.
 func hello(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Serving request: %s", r.URL.Path)
-	fmt.Fprintf(w, "Hello, Gavin60!\n")
+	fmt.Fprintf(w, "Hello, Gavin600 \n")
 	fmt.Fprintf(w, "Version: %s\n", Version)
 	fmt.Fprintf(w, "Build time: %s\n", Buildtime)
-	fmt.Fprintf(w, "D2iQ CI/CD!!!!!! deployments At May 27 2020， Done\n")
+	fmt.Fprintf(w, "D2iQ CI/CD!!!!!! deployments At July 27 2020， Done\n")
 }
 
 // [END all]
