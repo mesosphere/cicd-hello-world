@@ -1,30 +1,11 @@
-#!starlark
-# vi:syntax=python
-#
-#
+#!mesosphere/dispatch-starlark:v0.6
 
-def secretVar(name, key):
-    return k8s.corev1.EnvVarSource(secretKeyRef=k8s.corev1.SecretKeySelector(localObjectReference=k8s.corev1.LocalObjectReference(name=name), key=key))
+load("github.com/mesosphere/dispatch-catalog/starlark/stable/pipeline@0.0.6", "git_resource", "git_checkout_dir", "pull_request")
+load("github.com/cprovencher/import-dispatch-task-test/lints@ce9659d0485069b34d16cbdcfa9f0fa7de120df7", "shellcheck")
 
-gitResource("src-git",
-    url="$(context.git.url)",
-    revision="$(context.git.commit)")
+source_repo = git_resource("sources")
 
-dindTask("pr-helper", inputs=["src-git"], steps=[
-  v1.Container(
-      name="pr-helper",
-      image="mesosphere/konvoy-soak:pr-helper",
-      workingDir="/workspace/src-git/",
-      args=["python3", "pr_helper.py", "$(context.build.name)"],
-      env=[k8s.corev1.EnvVar(name="GITHUB_TOKEN", valueFrom=secretVar("cprovencher-pr-helper", "password"))],
-      resources = k8s.corev1.ResourceRequirements(
-          limits = {
-              "cpu": k8s.resource_quantity("1000m"),
-              "memory": k8s.resource_quantity("6Gi")
-          }
-      )
-  )
-])
+do_shellcheck = shellcheck("shellcheck", git_input=source_repo, paths=["script.sh"])
 
-action(tasks=["pr-helper"], on=pullRequest())
+action(tasks=[do_shellcheck], on=pull_request())
 
