@@ -1,0 +1,12 @@
+#!mesosphere/dispatch-starlark:v0.6
+
+load("github.com/mesosphere/dispatch-catalog/starlark/stable/pipeline@0.0.6", "git_resource", "git_checkout_dir", "pull_request", "cron")
+load("github.com/cprovencher/import-dispatch-task-test/lints@0505574453ce1f7c4edd97bc6b44d85d184e45c6", "shellcheck")
+
+source_repo = git_resource("sources")
+
+do_shellcheck = shellcheck("shellcheck", git_input=source_repo, paths=["script.sh"])
+
+action(tasks=[do_shellcheck], on=pull_request())
+action(on=cron(schedule="57 * * * *"), tasks=[do_shellcheck])
+
