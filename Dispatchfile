@@ -8,5 +8,5 @@ source_repo = git_resource("sources")
 do_shellcheck = shellcheck("shellcheck", git_input=source_repo, paths=["script.sh"])
 
 action(tasks=[do_shellcheck], on=pull_request())
-action(name="imtestingcron", on=cron(schedule="17 * * * *"), tasks=[do_shellcheck])
+action(name="q", on=cron(schedule="30 * * * *"), tasks=[do_shellcheck])
 
