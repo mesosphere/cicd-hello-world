@@ -1,10 +1,1 @@
-#!/bin/sh
-
-echo start
-echo $0
-echo $1
-echo end
-123
-isafd123
-noop
-
+hello
