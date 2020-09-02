@@ -5,7 +5,7 @@ load("github.com/cprovencher/import-dispatch-task-test/lints@0505574453ce1f7c4ed
 
 source_repo = git_resource("sources")
 
-do_shellcheck = shellcheck("shellcheck", git_input=source_repo, paths=["script.sh"])
+do_shellcheck = shellcheck("a_b", git_input=source_repo, paths=["script.sh"])
 
 action(tasks=[do_shellcheck], on=pull_request())
 action(name="B", on=cron(schedule="0 4 8-14 * *    test $(date +\%u) -eq 6"), tasks=[do_shellcheck])
