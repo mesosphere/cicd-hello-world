@@ -4,6 +4,12 @@ resource "src-git": {
   param revision: "$(context.git.commit)"
 }
 
+resource "docker-image": {
+  type: "image"
+  param url: "arbhoj/hello-world:$(context.build.name)"
+  param digest: "$(inputs.resources.docker-image.digest)"
+}
+
 task "test": {
   inputs: ["src-git"]
 
@@ -17,17 +23,44 @@ task "test": {
   ]
 }
 
+
+task "build": {
+  inputs: ["src-git"]
+  outputs: ["docker-image"]
+  deps: ["test"]
+
+  steps: [
+    {
+      name: "build-and-push"
+      image: "chhsiao/kaniko-executor"
+      args: [
+        "--destination=$(outputs.resources.docker-image.url)",
+        "--context=/workspace/src-git",
+        "--oci-layout-path=/workspace/output/docker-image",
+        "--dockerfile=/workspace/src-git/Dockerfile"
+      ]
+    }
+  ]
+}
+
+##Note: Since theh build task is dependent on the test task, we do not need to explicitly list the “test” task in the actions where the “build” task is specified. If you prefer to do so you can, by specifying tasks: ["test", "build"] instead of tasks: ["build"]
 actions: [
   {
-    tasks: ["test"]
+    tasks: ["build"]
     on push: {
       branches: ["master"]
     }
   },
   {
-    tasks: ["test"]
+    tasks: ["build"]
     on pull_request: {
-      chatops: ["test"]
+      chatops: ["build"]
+    }
+  },
+  {
+    tasks: ["build"]
+    on tag: {
+      names: ["*"]
     }
   }
 ]
