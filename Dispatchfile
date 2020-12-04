@@ -6,7 +6,7 @@ resource "src-git": {
 
 resource "docker-image": {
   type: "image"
-  param url: "arbhoj/hello-world:$(context.build.name)"
+  param url: "arvindbhoj/hello-world:$(context.build.name)"
   param digest: "$(inputs.resources.docker-image.digest)"
 }
 
@@ -43,7 +43,6 @@ task "build": {
   ]
 }
 
-##Note: Since theh build task is dependent on the test task, we do not need to explicitly list the “test” task in the actions where the “build” task is specified. If you prefer to do so you can, by specifying tasks: ["test", "build"] instead of tasks: ["build"]
 actions: [
   {
     tasks: ["build"]
