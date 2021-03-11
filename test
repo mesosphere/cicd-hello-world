@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  password: TTkqVEBzdGU=
+  username: YXJ2aW5kYmhvag==
+kind: Secret
+metadata:
+  annotations:
+    dispatch.d2iq.io/display-name: team-1-docker-auth-h96sv
+    tekton.dev/docker-0: https://index.docker.io/v1/
+  name: team-1-docker-auth-h96sv
+  namespace: default
